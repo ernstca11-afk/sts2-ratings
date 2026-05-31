@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STS2 Archetype Fun Ratings</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap');
+
+  :root {
+    --bg: #080b12;
+    --bg2: #0d1220;
+    --bg3: #141929;
+    --border: rgba(255,255,255,0.07);
+    --gold: #c9a84c;
+    --gold2: #e8c97a;
+    --glow: rgba(201,168,76,0.15);
+    --text: #d4cfc4;
+    --muted: #6b6658;
+    --regent: #9b6dff;
+    --ironclad: #e05c3a;
+    --silent: #4aaa8a;
+    --defect: #4ab3e8;
+    --necro: #b44aaa;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    padding: 0 0 80px;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(155,109,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(74,179,232,0.04) 0%, transparent 50%);
+  }
+
+  header {
+    text-align: center;
+    padding: 60px 24px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 900;
+    color: var(--gold2);
+    line-height: 1.1;
+    text-shadow: 0 0 40px rgba(201,168,76,0.3);
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    color: var(--muted);
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .player-section {
+    max-width: 560px;
+    margin: 48px auto 0;
+    padding: 0 24px;
+  }
+
+  .field-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .player-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 18px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 18px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .player-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--glow);
+  }
+
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 24px 0;
+  }
+
+  .character-block {
+    margin-bottom: 56px;
+  }
+
+  .character-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .char-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .character-name {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }
+
+  .archetypes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .archetype-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .archetype-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .archetype-card:hover {
+    border-color: rgba(255,255,255,0.15);
+    transform: translateY(-1px);
+  }
+
+  .archetype-card:hover::before {
+    opacity: 1;
+  }
+
+  .archetype-name {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .archetype-desc {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  .rating-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .rating-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
+
+  .star-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+    padding: 2px;
+    transition: transform 0.1s;
+    color: var(--muted);
+    opacity: 0.4;
+  }
+
+  .star-btn:hover,
+  .star-btn.active {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+
+  .star-btn.active {
+    filter: drop-shadow(0 0 4px rgba(201,168,76,0.6));
+  }
+
+  .win-badge {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-left: auto;
+  }
+
+  .section-divider {
+    text-align: center;
+    margin: 64px 0 0;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-divider-text {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .export-section {
+    max-width: 560px;
+    margin: 48px auto 0;
+    padding: 0 24px;
+    text-align: center;
+  }
+
+  .export-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #c9a84c, #e8c97a);
+    color: #080b12;
+    border: none;
+    border-radius: 4px;
+    padding: 18px 48px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s, transform 0.15s;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .export-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .export-hint {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .progress-bar {
+    height: 2px;
+    background: var(--border);
+    max-width: 560px;
+    margin: 32px auto;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  .progress-text {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  /* Character color accents */
+  .regent .char-dot { background: var(--regent); }
+  .regent .character-name { color: var(--regent); }
+  .regent .archetype-card::before { background: var(--regent); }
+  .regent .archetype-card:hover { border-color: rgba(155,109,255,0.3); }
+
+  .ironclad .char-dot { background: var(--ironclad); }
+  .ironclad .character-name { color: var(--ironclad); }
+  .ironclad .archetype-card::before { background: var(--ironclad); }
+  .ironclad .archetype-card:hover { border-color: rgba(224,92,58,0.3); }
+
+  .silent .char-dot { background: var(--silent); }
+  .silent .character-name { color: var(--silent); }
+  .silent .archetype-card::before { background: var(--silent); }
+  .silent .archetype-card:hover { border-color: rgba(74,170,138,0.3); }
+
+  .defect .char-dot { background: var(--defect); }
+  .defect .character-name { color: var(--defect); }
+  .defect .archetype-card::before { background: var(--defect); }
+  .defect .archetype-card:hover { border-color: rgba(74,179,232,0.3); }
+
+  .necro .char-dot { background: var(--necro); }
+  .necro .character-name { color: var(--necro); }
+  .necro .archetype-card::before { background: var(--necro); }
+  .necro .archetype-card:hover { border-color: rgba(180,74,170,0.3); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Slay the Spire 2</div>
+  <h1>Archetype<br>Fun Ratings</h1>
+  <p class="subtitle">Rate how much you enjoy each playstyle — 1 star to 5 stars</p>
+</header>
+
+<div class="player-section">
+  <label class="field-label" for="playerName">Your Name</label>
+  <input class="player-input" type="text" id="playerName" placeholder="Enter your name...">
+</div>
+
+<div class="main" id="formContent"></div>
+
+<div class="main">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-text" id="progressText">0 of 20 rated</div>
+
+  <div class="export-section">
+    <button class="export-btn" onclick="exportJSON()">⬇ Export Ratings as JSON</button>
+    <p class="export-hint">Save the file and load it into your Jupyter notebook</p>
+  </div>
+</div>
+
+<script>
+const archetypes = [
+  {
+    char: 'regent', label: 'Regent', cls: 'regent',
+    builds: [
+      { id: 'regent_stars',    name: 'Stars',         desc: 'Spend and generate stars, cosmic scaling' },
+      { id: 'regent_forge',    name: 'Forge / Blade', desc: 'Sovereign blade, sword upgrades, Fencing Manual' },
+      { id: 'regent_minion',   name: 'Minion',        desc: 'Colorless card creation, summon synergy' },
+      { id: 'regent_multihit', name: 'Multi-hit',     desc: 'Vigor stacking, multiple hit attacks' },
+    ]
+  },
+  {
+    char: 'ironclad', label: 'Ironclad', cls: 'ironclad',
+    builds: [
+      { id: 'ironclad_strength', name: 'Strength',     desc: 'Scale damage with Strength buffs over time' },
+      { id: 'ironclad_exhaust',  name: 'Exhaust',      desc: 'Exhaust cards for Corruption, Dark Embrace payoffs' },
+      { id: 'ironclad_block',    name: 'Block / Barricade', desc: 'Retain block, Body Slam damage' },
+      { id: 'ironclad_multihit', name: 'Multi-hit',    desc: 'Whirlwind, Vulnerable stacking, multi-target' },
+    ]
+  },
+  {
+    char: 'silent', label: 'Silent', cls: 'silent',
+    builds: [
+      { id: 'silent_shivs',   name: 'Shivs',          desc: 'Generate and buff shivs, Accuracy scaling' },
+      { id: 'silent_poison',  name: 'Poison',          desc: 'Stack poison, Noxious Fumes, Envenom' },
+      { id: 'silent_discard', name: 'Discard / Sly',   desc: 'Discard for energy and damage, Sly keyword' },
+    ]
+  },
+  {
+    char: 'defect', label: 'Defect', cls: 'defect',
+    builds: [
+      { id: 'defect_lightning', name: 'Lightning',     desc: 'Channel lightning orbs, Storm, Thunder payoffs' },
+      { id: 'defect_evoke',     name: 'Evoke',         desc: 'Dualcast, Quadcast, rapidly evoke orbs' },
+      { id: 'defect_darkness',  name: 'Darkness',      desc: 'Dark orb stacking, Consuming Shadow' },
+      { id: 'defect_claw',      name: 'Claw / Physical', desc: 'Scale Claw damage, Feral, All for One' },
+      { id: 'defect_status',    name: 'Status',        desc: 'Create statuses with Gunk Up, payoff with Smokestack' },
+    ]
+  },
+  {
+    char: 'necrobinder', label: 'Necrobinder', cls: 'necro',
+    builds: [
+      { id: 'necro_osty',     name: 'Osty',            desc: 'Summon health, buff and use Osty attacks' },
+      { id: 'necro_souls',    name: 'Souls',            desc: 'Generate souls, draw synergy, Haunt damage' },
+      { id: 'necro_doom',     name: 'Doom',             desc: 'Stack Doom, Countdown, End of Days payoffs' },
+      { id: 'necro_ethereal', name: 'Ethereal',         desc: 'Ethereal cards, Pagestorm, free high-cost plays' },
+    ]
+  }
+];
+
+const ratings = {};
+let totalRateable = 0;
+
+function buildForm() {
+  const container = document.getElementById('formContent');
+  
+  archetypes.forEach(char => {
+    totalRateable += char.builds.length;
+    const block = document.createElement('div');
+    block.className = `character-block ${char.cls}`;
+    
+    block.innerHTML = `
+      <div class="character-header">
+        <div class="char-dot"></div>
+        <div class="character-name">${char.label}</div>
+      </div>
+      <div class="archetypes-grid" id="grid-${char.char}"></div>
+    `;
+    container.appendChild(block);
+    
+    const grid = block.querySelector(`#grid-${char.char}`);
+    char.builds.forEach(build => {
+      const card = document.createElement('div');
+      card.className = 'archetype-card';
+      card.innerHTML = `
+        <div class="archetype-name">${build.name}</div>
+        <div class="archetype-desc">${build.desc}</div>
+        <div class="rating-row">
+          <span class="rating-label">Fun</span>
+          ${[1,2,3,4,5].map(n => `
+            <button class="star-btn" 
+              data-id="${build.id}" 
+              data-val="${n}" 
+              onclick="setRating('${build.id}', ${n})"
+              title="${n} star${n>1?'s':''}">★</button>
+          `).join('')}
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  });
+}
+
+function setRating(id, val) {
+  ratings[id] = val;
+  
+  // Update star display
+  document.querySelectorAll(`.star-btn[data-id="${id}"]`).forEach(btn => {
+    const btnVal = parseInt(btn.dataset.val);
+    btn.classList.toggle('active', btnVal <= val);
+    btn.style.color = btnVal <= val ? '#c9a84c' : '';
+  });
+  
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = Object.keys(ratings).length;
+  const pct = (count / totalRateable) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${count} of ${totalRateable} rated`;
+}
+
+function exportJSON() {
+  const playerName = document.getElementById('playerName').value.trim() || 'unknown';
+  
+  const output = {
+    player: playerName,
+    timestamp: new Date().toISOString(),
+    fun_ratings: ratings,
+    rated_count: Object.keys(ratings).length,
+    total_archetypes: totalRateable
+  };
+  
+  const blob = new Blob([JSON.stringify(output, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sts2_ratings_${playerName.toLowerCase().replace(/\s+/g,'_')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+buildForm();
+</script>
+</body>
+</html>
