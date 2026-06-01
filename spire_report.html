@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Spire Report</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=Cinzel+Decorative:wght@400;700&display=swap');
+
+:root {
+  --bg:#06080f; --bg2:#0a0e1a; --bg3:#0f1525; --bg4:#141d30;
+  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.12);
+  --gold:#c9a84c; --gold2:#e8c97a; --gold3:#f5e0a0;
+  --text:#d4cfc4; --muted:#5a5548; --muted2:#8a8278;
+  --ironclad:#e05c3a; --silent:#4aaa8a; --defect:#4ab3e8;
+  --regent:#9b6dff; --necro:#b44aaa;
+  --carl:#e8c97a; --rob:#4ab3e8; --greg:#2ecc71; --josh:#888;
+  --master:#ffd700; --expert:#a78bfa; --proficient:#38bdf8;
+  --practiced:#6ee7b7; --apprentice:#94a3b8; --novice:#475569;
+  --untried:#1e293b;
+  --tier-master:#ffd700; --tier-expert:#a78bfa;
+  --tier-proficient:#38bdf8; --tier-practiced:#34d399;
+  --tier-apprentice:#94a3b8; --tier-novice:#475569;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Crimson Pro',Georgia,serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+  opacity:0.4;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:100;
+  background:rgba(6,8,15,0.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  height:52px;
+}
+
+.nav-logo{
+  font-family:'Cinzel Decorative',serif;
+  font-size:13px;
+  color:var(--gold2);
+  letter-spacing:2px;
+  margin-right:24px;
+  white-space:nowrap;
+}
+
+.nav-link{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--muted2);
+  text-decoration:none;
+  padding:6px 12px;
+  border-radius:3px;
+  transition:color 0.2s, background 0.2s;
+  white-space:nowrap;
+}
+
+.nav-link:hover{color:var(--gold);background:rgba(201,168,76,0.08);}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:120px 32px 80px;
+  position:relative;
+  overflow:hidden;
+}
+
+.hero::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(155,109,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(74,179,232,0.04) 0%, transparent 50%);
+  pointer-events:none;
+}
+
+/* Decorative rune ring */
+.hero-ring{
+  width:320px; height:320px;
+  border:1px solid rgba(201,168,76,0.08);
+  border-radius:50%;
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  animation:spin 60s linear infinite;
+}
+
+.hero-ring::before{
+  content:'';
+  position:absolute;
+  inset:20px;
+  border:1px solid rgba(155,109,255,0.06);
+  border-radius:50%;
+  animation:spin 40s linear infinite reverse;
+}
+
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+
+.hero-eyebrow{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:6px;
+  color:var(--gold);
+  text-transform:uppercase;
+  margin-bottom:20px;
+  opacity:0.7;
+  position:relative;
+}
+
+.hero-title{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(36px,7vw,80px);
+  font-weight:700;
+  color:var(--gold2);
+  line-height:1.05;
+  text-shadow:0 0 80px rgba(201,168,76,0.25), 0 0 160px rgba(201,168,76,0.1);
+  position:relative;
+  margin-bottom:8px;
+}
+
+.hero-subtitle{
+  font-size:clamp(14px,2vw,20px);
+  color:var(--muted2);
+  font-style:italic;
+  font-weight:300;
+  letter-spacing:2px;
+  position:relative;
+  margin-bottom:48px;
+}
+
+.hero-stats{
+  display:flex;
+  gap:48px;
+  justify-content:center;
+  flex-wrap:wrap;
+  position:relative;
+  margin-bottom:64px;
+}
+
+.hero-stat{
+  text-align:center;
+}
+
+.hero-stat-val{
+  font-family:'Cinzel',serif;
+  font-size:clamp(24px,4vw,40px);
+  font-weight:900;
+  color:var(--gold2);
+  line-height:1;
+  margin-bottom:6px;
+}
+
+.hero-stat-label{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:3px;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
+.scroll-hint{
+  position:relative;
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:3px;
+  color:var(--muted);
+  text-transform:uppercase;
+  animation:pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
+
+/* ── SECTIONS ── */
+.section{
+  max-width:1200px;
+  margin:0 auto;
+  padding:80px 32px;
+  position:relative;
+}
+
+.section-header{
+  text-align:center;
+  margin-bottom:56px;
+}
+
+.section-eyebrow{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:5px;
+  color:var(--gold);
+  text-transform:uppercase;
+  margin-bottom:12px;
+  opacity:0.7;
+}
+
+.section-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(20px,3vw,32px);
+  font-weight:600;
+  color:var(--gold2);
+  letter-spacing:3px;
+  margin-bottom:12px;
+}
+
+.section-desc{
+  font-size:17px;
+  color:var(--muted2);
+  font-style:italic;
+  max-width:600px;
+  margin:0 auto;
+  line-height:1.6;
+}
+
+.divider{
+  width:100%;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--border2), transparent);
+  margin:0 auto;
+}
+
+/* ── GLOSSARY ── */
+.glossary-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(340px,1fr));
+  gap:16px;
+}
+
+.glossary-group{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:20px;
+}
+
+.glossary-group-title{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:14px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+
+.glossary-item{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  margin-bottom:12px;
+}
+
+.glossary-item:last-child{margin-bottom:0;}
+
+.stat-badge{
+  font-family:'Cinzel',serif;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:1px;
+  padding:3px 8px;
+  border-radius:3px;
+  background:rgba(201,168,76,0.1);
+  color:var(--gold2);
+  border:1px solid rgba(201,168,76,0.2);
+  white-space:nowrap;
+  flex-shrink:0;
+  min-width:36px;
+  text-align:center;
+}
+
+.glossary-text{
+  font-size:14px;
+  color:var(--muted2);
+  line-height:1.5;
+}
+
+.glossary-text strong{color:var(--text);}
+
+/* ── PLAYER PROFILES ── */
+.profiles-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(520px,1fr));
+  gap:24px;
+}
+
+.profile-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  transition:transform 0.2s, border-color 0.2s;
+  position:relative;
+}
+
+.profile-card:hover{
+  transform:translateY(-3px);
+  border-color:var(--border2);
+}
+
+.profile-card.pending{opacity:0.5;}
+
+.profile-header{
+  padding:24px;
+  display:flex;
+  align-items:center;
+  gap:20px;
+  position:relative;
+  overflow:hidden;
+}
+
+.profile-header::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 60%);
+  pointer-events:none;
+}
+
+/* Character avatar */
+.char-avatar{
+  width:72px; height:72px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  flex-shrink:0;
+  position:relative;
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+.char-avatar::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:10px;
+  background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent 60%);
+}
+
+.profile-info{flex:1;}
+
+.profile-name{
+  font-family:'Cinzel',serif;
+  font-size:22px;
+  font-weight:600;
+  letter-spacing:2px;
+  margin-bottom:4px;
+}
+
+.profile-char{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  opacity:0.5;
+  margin-bottom:8px;
+}
+
+.profile-quickstats{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+}
+
+.profile-qs{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:1px;
+  color:var(--muted2);
+}
+
+.profile-qs span{color:var(--gold2);font-weight:600;}
+
+/* Slash line */
+.slash-line-container{
+  padding:16px 24px;
+  background:var(--bg3);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+
+.slash-line-label{
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  letter-spacing:3px;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.slash-line{
+  display:flex;
+  gap:0;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:4px;
+}
+
+.slash-group{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.slash-stat{
+  text-align:center;
+}
+
+.slash-val{
+  font-family:'Cinzel',serif;
+  font-size:16px;
+  font-weight:600;
+  color:var(--gold2);
+  line-height:1;
+}
+
+.slash-key{
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  letter-spacing:1px;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
+.slash-sep{
+  font-family:'Cinzel',serif;
+  font-size:16px;
+  color:var(--muted);
+  margin:0 2px;
+  line-height:1;
+}
+
+.slash-pipe{
+  width:1px;
+  height:28px;
+  background:var(--border2);
+  margin:0 8px;
+}
+
+/* Radar charts */
+.radars-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:12px;
+  padding:20px 24px;
+}
+
+.radar-container{text-align:center;}
+
+.radar-title{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:2px;
+  color:var(--muted2);
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+/* Archetype mastery mini grid */
+.mastery-mini{
+  padding:16px 24px 20px;
+}
+
+.mastery-mini-title{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:3px;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+
+.mastery-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.mastery-chip{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:0.5px;
+  padding:3px 8px;
+  border-radius:3px;
+  border:1px solid transparent;
+  white-space:nowrap;
+}
+
+/* Profile insight */
+.profile-insight{
+  padding:14px 24px 20px;
+  font-size:14px;
+  color:var(--muted2);
+  line-height:1.6;
+  font-style:italic;
+  border-top:1px solid var(--border);
+}
+
+.profile-insight strong{color:var(--gold2);font-style:normal;}
+
+/* ── OVERVIEW TABLE ── */
+.overview-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+  margin-bottom:48px;
+}
+
+.overview-table th{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--muted);
+  padding:10px 14px;
+  text-align:left;
+  border-bottom:1px solid var(--border2);
+  white-space:nowrap;
+}
+
+.overview-table td{
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+
+.overview-table tr:hover td{background:rgba(255,255,255,0.02);}
+
+.stat-val{
+  font-family:'Cinzel',serif;
+  font-size:13px;
+  font-weight:600;
+}
+
+/* ── ARCHETYPE MASTERY FULL GRID ── */
+.mastery-section{padding:20px 0;}
+
+.mastery-char-block{margin-bottom:32px;}
+
+.mastery-char-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+
+.mastery-char-dot{width:8px;height:8px;border-radius:50%;}
+
+.mastery-char-name{
+  font-family:'Cinzel',serif;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:2px;
+}
+
+.mastery-grid{
+  display:grid;
+  grid-template-columns:200px repeat(4, 1fr);
+  gap:6px;
+  align-items:center;
+}
+
+.mastery-arch-name{
+  font-size:13px;
+  color:var(--muted2);
+  padding:6px 0;
+}
+
+.mastery-cell{
+  border-radius:6px;
+  padding:8px 12px;
+  text-align:center;
+  border:1px solid transparent;
+}
+
+.mastery-cell-tier{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:1px;
+  font-weight:600;
+  margin-bottom:2px;
+}
+
+.mastery-cell-runs{
+  font-size:11px;
+  opacity:0.6;
+}
+
+.mastery-header-cell{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  text-align:center;
+  padding:6px;
+}
+
+/* ── GROWTH SECTION ── */
+.growth-charts{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+}
+
+.chart-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:20px;
+}
+
+.chart-title{
+  font-family:'Cinzel',serif;
+  font-size:11px;
+  letter-spacing:2px;
+  color:var(--gold);
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+
+.chart-area{position:relative;}
+
+/* ── DISAGREEMENTS ── */
+.disagree-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+  gap:12px;
+}
+
+.disagree-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:16px;
+}
+
+.disagree-arch{
+  font-family:'Cinzel',serif;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:1px;
+  margin-bottom:10px;
+}
+
+.disagree-ratings{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.disagree-player{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+}
+
+.disagree-player-name{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.disagree-stars{font-size:14px;}
+
+/* ── PENDING CARD ── */
+.pending-overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(6,8,15,0.7);
+  backdrop-filter:blur(4px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border-radius:14px;
+}
+
+.pending-text{
+  font-family:'Cinzel',serif;
+  font-size:12px;
+  letter-spacing:3px;
+  color:var(--muted2);
+  text-transform:uppercase;
+}
+
+/* ── TIER COLORS ── */
+.tier-MASTER    {background:rgba(255,215,0,0.1);   border-color:rgba(255,215,0,0.3);   color:var(--tier-master);}
+.tier-EXPERT    {background:rgba(167,139,250,0.1); border-color:rgba(167,139,250,0.3); color:var(--tier-expert);}
+.tier-PROFICIENT{background:rgba(56,189,248,0.1);  border-color:rgba(56,189,248,0.3);  color:var(--tier-proficient);}
+.tier-PRACTICED {background:rgba(52,211,153,0.1);  border-color:rgba(52,211,153,0.3);  color:var(--tier-practiced);}
+.tier-APPRENTICE{background:rgba(148,163,184,0.1); border-color:rgba(148,163,184,0.3); color:var(--tier-apprentice);}
+.tier-NOVICE    {background:rgba(71,85,105,0.2);   border-color:rgba(71,85,105,0.3);   color:var(--tier-novice);}
+.tier-UNTRIED   {background:rgba(30,41,59,0.4);    border-color:rgba(30,41,59,0.3);    color:#334155;}
+
+/* ── UTILITY ── */
+.c-carl{color:var(--carl);}
+.c-rob{color:var(--rob);}
+.c-greg{color:var(--greg);}
+.c-josh{color:var(--josh);}
+.c-gold{color:var(--gold2);}
+.c-muted{color:var(--muted2);}
+
+.bg-ironclad{background:rgba(224,92,58,0.15); border-color:rgba(224,92,58,0.3);}
+.bg-silent  {background:rgba(74,170,138,0.15);border-color:rgba(74,170,138,0.3);}
+.bg-defect  {background:rgba(74,179,232,0.15);border-color:rgba(74,179,232,0.3);}
+.bg-regent  {background:rgba(155,109,255,0.15);border-color:rgba(155,109,255,0.3);}
+.bg-necro   {background:rgba(180,74,170,0.15);border-color:rgba(180,74,170,0.3);}
+
+.tag{
+  display:inline-block;
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  letter-spacing:2px;
+  padding:2px 7px;
+  border-radius:2px;
+  border:1px solid;
+  text-transform:uppercase;
+  margin-right:4px;
+}
+
+canvas{display:block;}
+
+@media(max-width:768px){
+  .profiles-grid{grid-template-columns:1fr;}
+  .radars-row{grid-template-columns:1fr;}
+  .growth-charts{grid-template-columns:1fr;}
+  .mastery-grid{grid-template-columns:140px repeat(3,1fr);}
+  nav{padding:0 16px;}
+  .hero-stats{gap:24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">✦ Spire Report</div>
+  <a href="#overview" class="nav-link">Overview</a>
+  <a href="#glossary" class="nav-link">Stats Guide</a>
+  <a href="#profiles" class="nav-link">Profiles</a>
+  <a href="#mastery" class="nav-link">Mastery</a>
+  <a href="#growth" class="nav-link">Growth</a>
+  <a href="#disagreements" class="nav-link">Taste</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="overview">
+  <div class="hero-ring"></div>
+  <div class="hero-eyebrow">Slay the Spire 2 — Group Analysis</div>
+  <h1 class="hero-title">The Spire<br>Report</h1>
+  <p class="hero-subtitle">Data-driven insights for every climb</p>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val" id="total-runs">—</div>
+      <div class="hero-stat-label">Total Runs</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val" id="total-wins">—</div>
+      <div class="hero-stat-label">Total Wins</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val" id="total-players">3</div>
+      <div class="hero-stat-label">Players</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">5</div>
+      <div class="hero-stat-label">Characters</div>
+    </div>
+  </div>
+
+  <!-- Group overview table -->
+  <div style="width:100%;max-width:900px;overflow-x:auto;">
+    <table class="overview-table" id="overview-table">
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Runs</th><th>Wins</th><th>Win%</th><th>Avg Asc</th>
+          <th>PTH</th><th>BLD</th><th>REF</th>
+          <th>SKL</th><th>CON</th><th>GRW</th>
+        </tr>
+      </thead>
+      <tbody id="overview-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="scroll-hint">↓ scroll to explore ↓</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- GLOSSARY -->
+<section class="section" id="glossary">
+  <div class="section-header">
+    <div class="section-eyebrow">Understanding the Numbers</div>
+    <div class="section-title">Stats Guide</div>
+    <div class="section-desc">Every stat explained — what it measures, why it matters, and what a high score means.</div>
+  </div>
+
+  <div class="glossary-grid">
+    <div class="glossary-group">
+      <div class="glossary-group-title" style="color:var(--gold)">⚔ Aggression Index — PTH / BLD / REF</div>
+      <div class="glossary-item">
+        <div class="stat-badge">PTH</div>
+        <div class="glossary-text"><strong>Pathing Aggression.</strong> How dangerously you navigate the map. Measures elite density per floor, gold investment ratio, and HP% when choosing to fight elites. High PTH = you fight elites at low HP and spend gold aggressively.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge">BLD</div>
+        <div class="glossary-text"><strong>Build Aggression.</strong> How offensively you construct your deck, normalized by character. Measures attack ratio vs character baseline, aggressive power usage. High BLD = attack-heavy, aggressive power choices.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge">REF</div>
+        <div class="glossary-text"><strong>Refinement.</strong> Deck cleanliness and discipline. Rewards removing starter cards and curses, penalizes bloat. High REF = lean, purposeful deck. <em>Only stat that directly predicts wins (+0.228 gap).</em></div>
+      </div>
+    </div>
+
+    <div class="glossary-group">
+      <div class="glossary-group-title" style="color:#a78bfa">✦ Skill Line — SKL / CON / GRW</div>
+      <div class="glossary-item">
+        <div class="stat-badge">SKL</div>
+        <div class="glossary-text"><strong>Skill Rating.</strong> How much you outperform the expected win rate at your chosen difficulty. Accounts for ascension level, floor depth, and attempt bonus for pushing harder content. High SKL = winning more than you should at your ascension.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge">CON</div>
+        <div class="glossary-text"><strong>Consistency.</strong> Does your deck building quality translate to wins? Measures REF gap between wins and losses, and archetype commitment on winning vs losing runs. High CON = you execute well when it matters.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge">GRW</div>
+        <div class="glossary-text"><strong>Growth.</strong> Are you improving over time? Compares early vs late runs on SKL improvement, REF trend, and ascension climbing rate. High GRW = meaningful progression within your play period.</div>
+      </div>
+    </div>
+
+    <div class="glossary-group">
+      <div class="glossary-group-title" style="color:#38bdf8">◎ Performance Stats — EXP / CLT / ADP / EFF / RSL</div>
+      <div class="glossary-item">
+        <div class="stat-badge">EXP</div>
+        <div class="glossary-text"><strong>Experience.</strong> Archetype mastery depth. Peak win rate on your best archetype, breadth of archetypes tried, improvement on most-played strategy.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge">CLT</div>
+        <div class="glossary-text"><strong>Clutch.</strong> Performance under pressure. Win rate arriving at bosses below 40% HP, win rate after going below 30% HP mid-run.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge">ADP</div>
+        <div class="glossary-text"><strong>Adaptability.</strong> Breadth of viable archetypes and characters. How many different strategies and characters you win with.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge">EFF</div>
+        <div class="glossary-text"><strong>Efficiency.</strong> Resource conversion quality. Relics extracted per elite fought, upgrades per smith, gold value per shop visit.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge">RSL</div>
+        <div class="glossary-text"><strong>Resilience.</strong> Recovery from early adversity. Win rate on runs where you were at low HP early, took heavy act 1 damage, or had a brutal first elite.</div>
+      </div>
+    </div>
+
+    <div class="glossary-group">
+      <div class="glossary-group-title" style="color:var(--tier-master)">★ Archetype Tiers</div>
+      <div class="glossary-item">
+        <div class="stat-badge tier-MASTER" style="font-size:10px">MASTER</div>
+        <div class="glossary-text">6+ runs, winning at <strong>double the expected rate</strong> for your ascension level.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge tier-EXPERT" style="font-size:10px">EXPERT</div>
+        <div class="glossary-text">5+ runs, outperforming expected win rate by <strong>50%+</strong>.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge tier-PROFICIENT" style="font-size:10px">PROFICIENT</div>
+        <div class="glossary-text">Beating expected win rate but not yet at Expert threshold.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge tier-PRACTICED" style="font-size:10px">PRACTICED</div>
+        <div class="glossary-text">10+ runs but at or below expected win rate. Experience without results yet.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge tier-APPRENTICE" style="font-size:10px">APPRENTICE</div>
+        <div class="glossary-text">3-9 runs, still learning.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="stat-badge tier-NOVICE" style="font-size:10px">NOVICE</div>
+        <div class="glossary-text">Fewer than 3 runs. Insufficient data.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PLAYER PROFILES -->
+<section class="section" id="profiles">
+  <div class="section-header">
+    <div class="section-eyebrow">Individual Analysis</div>
+    <div class="section-title">Player Profiles</div>
+    <div class="section-desc">Full stat lines, radar charts, and archetype mastery for each player.</div>
+  </div>
+  <div class="profiles-grid" id="profiles-grid"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ARCHETYPE MASTERY -->
+<section class="section" id="mastery">
+  <div class="section-header">
+    <div class="section-eyebrow">Expertise Breakdown</div>
+    <div class="section-title">Archetype Mastery</div>
+    <div class="section-desc">Every archetype, every player — color coded by mastery tier with run counts and win rates.</div>
+  </div>
+  <div id="mastery-grid-container"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- GROWTH -->
+<section class="section" id="growth">
+  <div class="section-header">
+    <div class="section-eyebrow">Over Time</div>
+    <div class="section-title">Growth & Progression</div>
+    <div class="section-desc">Rolling win rates and ascension progression across the play period.</div>
+  </div>
+  <div class="growth-charts">
+    <div class="chart-card">
+      <div class="chart-title">Rolling Win Rate (10-run window)</div>
+      <canvas id="wrChart" height="220"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Ascension Progression</div>
+      <canvas id="ascChart" height="220"></canvas>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TASTE DISAGREEMENTS -->
+<section class="section" id="disagreements">
+  <div class="section-header">
+    <div class="section-eyebrow">Fun Ratings</div>
+    <div class="section-title">Where Tastes Diverge</div>
+    <div class="section-desc">Archetypes where the group disagrees most on enjoyment — revealing each player's unique personality.</div>
+  </div>
+  <div class="disagree-grid" id="disagree-grid"></div>
+</section>
+
+<div style="height:80px;"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const DATA = {"players":[{"name":"Carl","runs":149,"wins":24,"win_rate":0.161,"avg_ascension":3.3,"most_played_char":"REGENT","stats":{"PTH":0.798,"BLD":0.352,"REF":0.436,"SKL":0.509,"CON":0.693,"GRW":0.558,"EXP":0.464,"CLT":0.491,"ADP":1.0,"EFF":0.942,"RSL":0.316},"archetypes":{"regent_stars":{"tier":"PRACTICED","runs":35,"wins":3,"actual_wr":0.09,"expected_wr":0.2,"gap":-0.11},"regent_forge":{"tier":"EXPERT","runs":17,"wins":5,"actual_wr":0.29,"expected_wr":0.18,"gap":0.11},"regent_minion":{"tier":"PRACTICED","runs":20,"wins":0,"actual_wr":0.0,"expected_wr":0.2,"gap":-0.2},"regent_multihit":{"tier":"PRACTICED","runs":17,"wins":0,"actual_wr":0.0,"expected_wr":0.18,"gap":-0.18},"ironclad_strength":{"tier":"NOVICE","runs":1,"wins":1,"actual_wr":1.0,"expected_wr":null,"gap":null},"ironclad_block":{"tier":"APPRENTICE","runs":3,"wins":0,"actual_wr":0.0,"expected_wr":0.33,"gap":-0.33},"ironclad_multihit":{"tier":"PROFICIENT","runs":4,"wins":2,"actual_wr":0.5,"expected_wr":0.32,"gap":0.18},"silent_shivs":{"tier":"APPRENTICE","runs":3,"wins":1,"actual_wr":0.33,"expected_wr":0.37,"gap":-0.03},"silent_poison":{"tier":"NOVICE","runs":2,"wins":0,"actual_wr":0.0,"expected_wr":null,"gap":null},"silent_discard":{"tier":"NOVICE","runs":1,"wins":0,"actual_wr":0.0,"expected_wr":null,"gap":null},"defect_lightning":{"tier":"PRACTICED","runs":18,"wins":4,"actual_wr":0.22,"expected_wr":0.24,"gap":-0.02},"defect_evoke":{"tier":"EXPERT","runs":7,"wins":2,"actual_wr":0.29,"expected_wr":0.17,"gap":0.11},"defect_darkness":{"tier":"APPRENTICE","runs":3,"wins":0,"actual_wr":0.0,"expected_wr":0.2,"gap":-0.2},"defect_claw":{"tier":"PROFICIENT","runs":4,"wins":2,"actual_wr":0.5,"expected_wr":0.16,"gap":0.34},"defect_status":{"tier":"UNTRIED","runs":0,"wins":0,"actual_wr":null,"expected_wr":null,"gap":null},"necro_osty":{"tier":"UNTRIED","runs":0,"wins":0,"actual_wr":null,"expected_wr":null,"gap":null},"necro_souls":{"tier":"UNTRIED","runs":0,"wins":0,"actual_wr":null,"expected_wr":null,"gap":null},"necro_doom":{"tier":"UNTRIED","runs":0,"wins":0,"actual_wr":null,"expected_wr":null,"gap":null},"necro_ethereal":{"tier":"UNTRIED","runs":0,"wins":0,"actual_wr":null,"expected_wr":null,"gap":null}},"rolling_wr":[0.3,0.2,0.1,0.1,0.0,0.0,0.0,0.1,0.0,0.3,0.2,0.2,0.3,0.4,0.2],"rolling_asc":[0.2,0.6,2.9,3.9,4.0,4.0,4.0,4.6,2.2,4.2,1.8,5.5,3.8,5.0,3.2]},{"name":"Rob","runs":12,"wins":5,"win_rate":0.417,"avg_ascension":0.0,"most_played_char":"NECROBINDER","stats":{"PTH":0.542,"BLD":0.570,"REF":0.455,"SKL":0.643,"CON":0.766,"GRW":null,"EXP":null,"CLT":1.0,"ADP":0.560,"EFF":0.938,"RSL":null},"archetypes":{"regent_stars":{"tier":"NOVICE","runs":2,"wins":0,"actual_wr":0.0,"expected_wr":null,"gap":null},"ironclad_multihit":{"tier":"NOVICE","runs":2,"wins":2,"actual_wr":1.0,"expected_wr":null,"gap":null},"silent_shivs":{"tier":"NOVICE","runs":1,"wins":0,"actual_wr":0.0,"expected_wr":null,"gap":null},"defect_lightning":{"tier":"NOVICE","runs":2,"wins":2,"actual_wr":1.0,"expected_wr":null,"gap":null}},"rolling_wr":[0.4,0.5,0.4],"rolling_asc":[0.0,0.0,0.0]},{"name":"Greg","runs":220,"wins":52,"win_rate":0.236,"avg_ascension":5.9,"most_played_char":"REGENT","stats":{"PTH":0.670,"BLD":0.368,"REF":0.415,"SKL":0.751,"CON":0.724,"GRW":0.495,"EXP":0.803,"CLT":0.334,"ADP":1.0,"EFF":0.903,"RSL":0.328},"archetypes":{"regent_stars":{"tier":"PRACTICED","runs":32,"wins":3,"actual_wr":0.09,"expected_wr":0.2,"gap":-0.11},"regent_forge":{"tier":"MASTER","runs":6,"wins":4,"actual_wr":0.67,"expected_wr":0.17,"gap":0.49},"regent_minion":{"tier":"APPRENTICE","runs":9,"wins":0,"actual_wr":0.0,"expected_wr":0.13,"gap":-0.13},"regent_multihit":{"tier":"EXPERT","runs":11,"wins":3,"actual_wr":0.27,"expected_wr":0.17,"gap":0.1},"ironclad_strength":{"tier":"PROFICIENT","runs":3,"wins":1,"actual_wr":0.33,"expected_wr":0.19,"gap":0.14},"ironclad_exhaust":{"tier":"NOVICE","runs":2,"wins":2,"actual_wr":1.0,"expected_wr":null,"gap":null},"ironclad_block":{"tier":"EXPERT","runs":25,"wins":5,"actual_wr":0.2,"expected_wr":0.12,"gap":0.08},"ironclad_multihit":{"tier":"EXPERT","runs":9,"wins":3,"actual_wr":0.33,"expected_wr":0.18,"gap":0.15},"silent_shivs":{"tier":"EXPERT","runs":21,"wins":5,"actual_wr":0.24,"expected_wr":0.12,"gap":0.11},"silent_poison":{"tier":"APPRENTICE","runs":7,"wins":0,"actual_wr":0.0,"expected_wr":0.13,"gap":-0.13},"silent_discard":{"tier":"MASTER","runs":14,"wins":5,"actual_wr":0.36,"expected_wr":0.18,"gap":0.18},"defect_lightning":{"tier":"PROFICIENT","runs":19,"wins":3,"actual_wr":0.16,"expected_wr":0.14,"gap":0.02},"defect_evoke":{"tier":"PROFICIENT","runs":4,"wins":1,"actual_wr":0.25,"expected_wr":0.07,"gap":0.18},"defect_darkness":{"tier":"PROFICIENT","runs":3,"wins":1,"actual_wr":0.33,"expected_wr":0.18,"gap":0.15},"defect_claw":{"tier":"MASTER","runs":7,"wins":5,"actual_wr":0.71,"expected_wr":0.14,"gap":0.58},"defect_status":{"tier":"UNTRIED","runs":0,"wins":0,"actual_wr":null,"expected_wr":null,"gap":null},"necro_osty":{"tier":"UNTRIED","runs":0,"wins":0,"actual_wr":null,"expected_wr":null,"gap":null},"necro_souls":{"tier":"UNTRIED","runs":0,"wins":0,"actual_wr":null,"expected_wr":null,"gap":null},"necro_doom":{"tier":"UNTRIED","runs":0,"wins":0,"actual_wr":null,"expected_wr":null,"gap":null},"necro_ethereal":{"tier":"UNTRIED","runs":0,"wins":0,"actual_wr":null,"expected_wr":null,"gap":null}},"rolling_wr":[0.3,0.6,0.5,0.4,0.4,0.2,0.4,0.3,0.1,0.3,0.1,0.3,0.2,0.1,0.2,0.3,0.0,0.4,0.0,0.0,0.1,0.0],"rolling_asc":[0.0,0.4,1.3,2.5,3.5,4.0,4.9,5.2,5.5,6.8,3.9,6.3,6.5,7.0,7.6,8.2,9.0,9.0,9.0,9.0,9.6,10.0]},{"name":"Josh","runs":null,"wins":null,"win_rate":null,"avg_ascension":null,"most_played_char":null,"pending":true,"stats":{},"archetypes":{}}],"fun_ratings":{"carl":{"defect_claw":5,"defect_darkness":4,"defect_evoke":4,"defect_lightning":3,"defect_status":5,"ironclad_block":3,"ironclad_exhaust":3,"ironclad_multihit":5,"ironclad_strength":4,"necro_doom":2,"necro_ethereal":4,"necro_osty":3,"necro_souls":5,"regent_forge":3,"regent_minion":4,"regent_multihit":5,"regent_stars":2,"silent_discard":3,"silent_poison":1,"silent_shivs":3},"rob":{"defect_claw":2,"defect_darkness":1,"defect_evoke":3,"defect_lightning":5,"defect_status":1,"ironclad_block":3,"ironclad_multihit":4,"ironclad_strength":2,"necro_doom":1,"necro_ethereal":1,"necro_osty":3,"necro_souls":2,"regent_multihit":5,"regent_stars":4,"silent_discard":3,"silent_poison":3,"silent_shivs":5},"greg":{"defect_claw":5,"defect_darkness":3,"defect_evoke":3,"defect_lightning":3,"defect_status":5,"ironclad_block":4,"ironclad_exhaust":2,"ironclad_multihit":3,"ironclad_strength":3,"necro_doom":3,"necro_ethereal":2,"necro_osty":4,"necro_souls":3,"regent_forge":4,"regent_minion":1,"regent_multihit":3,"regent_stars":4,"silent_discard":2,"silent_poison":4,"silent_shivs":4}}};
+
+const PLAYER_COLORS = {Carl:'#e8c97a', Rob:'#4ab3e8', Greg:'#2ecc71', Josh:'#888'};
+const CHAR_COLORS = {IRONCLAD:'#e05c3a',SILENT:'#4aaa8a',DEFECT:'#4ab3e8',REGENT:'#9b6dff',NECROBINDER:'#b44aaa'};
+const CHAR_SYMBOLS = {IRONCLAD:'⚔',SILENT:'🗡',DEFECT:'◎',REGENT:'✦',NECROBINDER:'☠'};
+const CHAR_LABELS = {IRONCLAD:'The Ironclad',SILENT:'The Silent',DEFECT:'The Defect',REGENT:'The Regent',NECROBINDER:'Necrobinder'};
+
+const ARCH_CHARS = {
+  regent_stars:'regent',regent_forge:'regent',regent_minion:'regent',regent_multihit:'regent',
+  ironclad_strength:'ironclad',ironclad_exhaust:'ironclad',ironclad_block:'ironclad',ironclad_multihit:'ironclad',
+  silent_shivs:'silent',silent_poison:'silent',silent_discard:'silent',
+  defect_lightning:'defect',defect_evoke:'defect',defect_darkness:'defect',defect_claw:'defect',defect_status:'defect',
+  necro_osty:'necro',necro_souls:'necro',necro_doom:'necro',necro_ethereal:'necro'
+};
+
+const ARCH_LABELS = {
+  regent_stars:'Stars',regent_forge:'Forge',regent_minion:'Minion',regent_multihit:'Multi-hit',
+  ironclad_strength:'Strength',ironclad_exhaust:'Exhaust',ironclad_block:'Block',ironclad_multihit:'Multi-hit',
+  silent_shivs:'Shivs',silent_poison:'Poison',silent_discard:'Discard',
+  defect_lightning:'Lightning',defect_evoke:'Evoke',defect_darkness:'Darkness',defect_claw:'Claw',defect_status:'Status',
+  necro_osty:'Osty',necro_souls:'Souls',necro_doom:'Doom',necro_ethereal:'Ethereal'
+};
+
+// ============================================================
+// HERO STATS
+// ============================================================
+const activePlayers = DATA.players.filter(p => !p.pending);
+document.getElementById('total-runs').textContent = activePlayers.reduce((s,p)=>s+p.runs,0);
+document.getElementById('total-wins').textContent = activePlayers.reduce((s,p)=>s+p.wins,0);
+
+// ============================================================
+// OVERVIEW TABLE
+// ============================================================
+const tbody = document.getElementById('overview-tbody');
+DATA.players.forEach(p => {
+  const c = PLAYER_COLORS[p.name] || '#888';
+  const fmt = v => v != null ? v.toFixed(3) : '—';
+  const fmtPct = v => v != null ? (v*100).toFixed(1)+'%' : '—';
+  if (p.pending) {
+    tbody.innerHTML += `<tr>
+      <td style="color:${c};font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px">${p.name} <span style="color:var(--muted);font-size:10px">(pending)</span></td>
+      <td colspan="10" style="color:var(--muted);font-style:italic;font-size:13px">Data not yet available</td>
+    </tr>`;
+    return;
+  }
+  const s = p.stats;
+  tbody.innerHTML += `<tr>
+    <td style="color:${c};font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px">${p.name}</td>
+    <td>${p.runs}</td>
+    <td>${p.wins}</td>
+    <td style="color:var(--gold2)">${fmtPct(p.win_rate)}</td>
+    <td>${p.avg_ascension.toFixed(1)}</td>
+    <td class="stat-val" style="color:var(--carl)">${fmt(s.PTH)}</td>
+    <td class="stat-val">${fmt(s.BLD)}</td>
+    <td class="stat-val" style="color:var(--gold2)">${fmt(s.REF)}</td>
+    <td class="stat-val" style="color:#a78bfa">${fmt(s.SKL)}</td>
+    <td class="stat-val">${fmt(s.CON)}</td>
+    <td class="stat-val">${fmt(s.GRW)}</td>
+  </tr>`;
+});
+
+// ============================================================
+// RADAR CHART (SVG-based, no external deps)
+// ============================================================
+function drawRadar(canvasId, labels, datasets, color) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.offsetWidth || 200;
+  const H = canvas.height = 200;
+  const cx = W/2, cy = H/2;
+  const r = Math.min(W,H)/2 - 30;
+  const n = labels.length;
+  ctx.clearRect(0,0,W,H);
+
+  // Draw background rings
+  for (let i=1;i<=5;i++) {
+    const ri = r*i/5;
+    ctx.beginPath();
+    for (let j=0;j<n;j++) {
+      const a = (j/n)*Math.PI*2 - Math.PI/2;
+      const x = cx + ri*Math.cos(a), y = cy + ri*Math.sin(a);
+      j===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Draw axes
+  for (let j=0;j<n;j++) {
+    const a = (j/n)*Math.PI*2 - Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+r*Math.cos(a), cy+r*Math.sin(a));
+    ctx.strokeStyle='rgba(255,255,255,0.08)';
+    ctx.stroke();
+    // Labels
+    const lx = cx+(r+18)*Math.cos(a), ly = cy+(r+18)*Math.sin(a);
+    ctx.fillStyle='rgba(200,190,180,0.6)';
+    ctx.font = "bold 9px 'Cinzel', serif";
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(labels[j], lx, ly);
+  }
+
+  // Draw data polygon
+  datasets.forEach(ds => {
+    ctx.beginPath();
+    ds.values.forEach((v,j) => {
+      const a = (j/n)*Math.PI*2 - Math.PI/2;
+      const rv = r*Math.min(v,1);
+      const x = cx+rv*Math.cos(a), y = cy+rv*Math.sin(a);
+      j===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.closePath();
+    ctx.fillStyle = ds.color+'22';
+    ctx.fill();
+    ctx.strokeStyle = ds.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+}
+
+// ============================================================
+// PLAYER PROFILES
+// ============================================================
+const profilesGrid = document.getElementById('profiles-grid');
+
+DATA.players.forEach(p => {
+  const pc = PLAYER_COLORS[p.name] || '#888';
+  const char = p.most_played_char;
+  const charColor = char ? (CHAR_COLORS[char] || '#888') : '#888';
+  const charSymbol = char ? (CHAR_SYMBOLS[char] || '?') : '?';
+  const charLabel = char ? (CHAR_LABELS[char] || char) : 'Unknown';
+
+  const card = document.createElement('div');
+  card.className = 'profile-card' + (p.pending ? ' pending' : '');
+
+  if (p.pending) {
+    card.innerHTML = `
+      <div class="profile-header" style="background:rgba(0,0,0,0.2)">
+        <div class="char-avatar" style="background:rgba(100,100,100,0.1);border-color:rgba(100,100,100,0.2)">
+          <span style="font-size:28px;opacity:0.3">?</span>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name" style="color:#666">${p.name}</div>
+          <div class="profile-char" style="color:#444">Data Pending</div>
+        </div>
+      </div>
+      <div class="pending-overlay">
+        <div style="font-size:32px;opacity:0.3">⏳</div>
+        <div class="pending-text">Awaiting run data</div>
+        <div style="font-size:12px;color:var(--muted);font-style:italic">Profile will appear once data is submitted</div>
+      </div>`;
+    profilesGrid.appendChild(card);
+    return;
+  }
+
+  const s = p.stats;
+  const fmt = v => v != null ? v.toFixed(3) : 'n/a';
+
+  // Profile header
+  const headerBg = `linear-gradient(135deg, ${charColor}15 0%, transparent 60%)`;
+
+  // Mastery chips
+  const topArchs = Object.entries(p.archetypes)
+    .filter(([k,v]) => v.tier !== 'UNTRIED' && v.tier !== 'NOVICE')
+    .sort((a,b) => {
+      const tierOrder = {MASTER:0,EXPERT:1,PROFICIENT:2,PRACTICED:3,APPRENTICE:4};
+      return (tierOrder[a[1].tier]||9) - (tierOrder[b[1].tier]||9);
+    })
+    .slice(0,8);
+
+  const chips = topArchs.map(([k,v]) =>
+    `<div class="mastery-chip tier-${v.tier}">${ARCH_LABELS[k] || k} · ${v.runs}r</div>`
+  ).join('');
+
+  // Insight text
+  const insights = {
+    Carl: `<strong>The Aggressive Generalist.</strong> Highest PTH in the group — fights elites at low HP and spends gold freely. Has won with every character and 8 archetypes (perfect ADP) but hasn't mastered any single one yet. Strong growth trajectory with SKL jumping from .392 to .732 in the late period. Your REF is improving — keep removing starter cards.`,
+    Rob: `<strong>The Precision Finisher.</strong> Most aggressive builder in the group, best consistency, perfect CLT. Converts every advantage into a win. Small sample size makes deeper analysis difficult — more runs needed to reveal the full picture. Conservative map routing suggests a calculated, patient playstyle.`,
+    Greg: `<strong>The Veteran Climber.</strong> Most experienced player — 220 runs across all characters and ascensions up to 10. Three MASTER tier archetypes. Deliberately pushes into harder content even as raw win rate drops. Weakest CLT reflects the brutal reality of Ascension 9+ — not a skill gap, a difficulty wall.`
+  };
+
+  card.innerHTML = `
+    <div class="profile-header" style="background:${headerBg}">
+      <div class="char-avatar" style="background:${charColor}20;border-color:${charColor}40">
+        <span>${charSymbol}</span>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name" style="color:${pc}">${p.name}</div>
+        <div class="profile-char" style="color:${charColor}">${charLabel} main</div>
+        <div class="profile-quickstats">
+          <div class="profile-qs"><span>${p.runs}</span> runs</div>
+          <div class="profile-qs"><span>${p.wins}</span> wins</div>
+          <div class="profile-qs"><span>${(p.win_rate*100).toFixed(1)}%</span> win rate</div>
+          <div class="profile-qs">avg asc <span>${p.avg_ascension.toFixed(1)}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slash-line-container">
+      <div class="slash-line-label">Aggression Index / Skill Line / Performance</div>
+      <div class="slash-line">
+        <div class="slash-group">
+          ${['PTH','BLD','REF'].map((k,i) => `
+            <div class="slash-stat">
+              <div class="slash-val" style="color:${pc}">${fmt(s[k])}</div>
+              <div class="slash-key">${k}</div>
+            </div>
+            ${i<2?'<div class="slash-sep">/</div>':''}
+          `).join('')}
+        </div>
+        <div class="slash-pipe"></div>
+        <div class="slash-group">
+          ${['SKL','CON','GRW'].map((k,i) => `
+            <div class="slash-stat">
+              <div class="slash-val">${fmt(s[k])}</div>
+              <div class="slash-key">${k}</div>
+            </div>
+            ${i<2?'<div class="slash-sep">/</div>':''}
+          `).join('')}
+        </div>
+        <div class="slash-pipe"></div>
+        <div class="slash-group">
+          ${['EXP','CLT','ADP','EFF','RSL'].map((k,i) => `
+            <div class="slash-stat">
+              <div class="slash-val" style="font-size:13px">${fmt(s[k])}</div>
+              <div class="slash-key">${k}</div>
+            </div>
+            ${i<4?'<div class="slash-sep" style="font-size:12px">/</div>':''}
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="radars-row">
+      <div class="radar-container">
+        <div class="radar-title">Style</div>
+        <canvas id="radar-style-${p.name}" width="150" height="150"></canvas>
+      </div>
+      <div class="radar-container">
+        <div class="radar-title">Skill</div>
+        <canvas id="radar-skill-${p.name}" width="150" height="150"></canvas>
+      </div>
+      <div class="radar-container">
+        <div class="radar-title">Performance</div>
+        <canvas id="radar-perf-${p.name}" width="150" height="150"></canvas>
+      </div>
+    </div>
+
+    <div class="mastery-mini">
+      <div class="mastery-mini-title">Archetype Mastery Highlights</div>
+      <div class="mastery-chips">${chips || '<span style="color:var(--muted);font-size:13px;font-style:italic">Insufficient data for tier ratings</span>'}</div>
+    </div>
+
+    <div class="profile-insight">${insights[p.name] || ''}</div>
+  `;
+
+  profilesGrid.appendChild(card);
+
+  // Draw radars after DOM insertion
+  setTimeout(() => {
+    const styleCanvas = document.getElementById(`radar-style-${p.name}`);
+    const skillCanvas  = document.getElementById(`radar-skill-${p.name}`);
+    const perfCanvas   = document.getElementById(`radar-perf-${p.name}`);
+    if(styleCanvas) styleCanvas.width = styleCanvas.offsetParent?.offsetWidth || 150;
+    if(skillCanvas) skillCanvas.width = skillCanvas.offsetParent?.offsetWidth || 150;
+    if(perfCanvas)  perfCanvas.width  = perfCanvas.offsetParent?.offsetWidth  || 150;
+
+    drawRadar(`radar-style-${p.name}`,
+      ['PTH','BLD','REF'],
+      [{values:[s.PTH||0, s.BLD||0, s.REF||0], color:pc}], pc);
+
+    drawRadar(`radar-skill-${p.name}`,
+      ['SKL','CON','GRW','EXP'],
+      [{values:[s.SKL||0, s.CON||0, s.GRW||0, s.EXP||0], color:pc}], pc);
+
+    drawRadar(`radar-perf-${p.name}`,
+      ['CLT','ADP','EFF','RSL'],
+      [{values:[s.CLT||0, s.ADP||0, s.EFF||0, s.RSL||0], color:pc}], pc);
+  }, 100);
+});
+
+// ============================================================
+// ARCHETYPE MASTERY FULL GRID
+// ============================================================
+const container = document.getElementById('mastery-grid-container');
+const charGroups = {
+  regent:   {label:'Regent',   color:CHAR_COLORS.REGENT,    archs:['regent_stars','regent_forge','regent_minion','regent_multihit']},
+  ironclad: {label:'Ironclad', color:CHAR_COLORS.IRONCLAD,  archs:['ironclad_strength','ironclad_exhaust','ironclad_block','ironclad_multihit']},
+  silent:   {label:'Silent',   color:CHAR_COLORS.SILENT,    archs:['silent_shivs','silent_poison','silent_discard']},
+  defect:   {label:'Defect',   color:CHAR_COLORS.DEFECT,    archs:['defect_lightning','defect_evoke','defect_darkness','defect_claw','defect_status']},
+  necro:    {label:'Necrobinder', color:CHAR_COLORS.NECROBINDER, archs:['necro_osty','necro_souls','necro_doom','necro_ethereal']},
+};
+
+const activePl = DATA.players.filter(p=>!p.pending);
+
+Object.entries(charGroups).forEach(([charKey, cg]) => {
+  const block = document.createElement('div');
+  block.className = 'mastery-char-block';
+
+  const colCount = activePl.length;
+  block.innerHTML = `
+    <div class="mastery-char-header">
+      <div class="mastery-char-dot" style="background:${cg.color}"></div>
+      <div class="mastery-char-name" style="color:${cg.color}">${cg.label}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:180px ${activePl.map(()=>'1fr').join(' ')};gap:6px;margin-bottom:6px">
+      <div></div>
+      ${activePl.map(p=>`<div class="mastery-header-cell" style="color:${PLAYER_COLORS[p.name]}">${p.name}</div>`).join('')}
+    </div>
+    ${cg.archs.map(arch => `
+      <div style="display:grid;grid-template-columns:180px ${activePl.map(()=>'1fr').join(' ')};gap:6px;margin-bottom:6px;align-items:center">
+        <div class="mastery-arch-name">${ARCH_LABELS[arch]}</div>
+        ${activePl.map(p => {
+          const data = p.archetypes[arch];
+          if (!data) return `<div class="mastery-cell tier-UNTRIED"><div class="mastery-cell-tier">—</div></div>`;
+          const wr = data.actual_wr != null ? (data.actual_wr*100).toFixed(0)+'%' : '—';
+          const gap = data.gap != null ? (data.gap>=0?'+':'')+Math.round(data.gap*100)+'%' : '';
+          return `<div class="mastery-cell tier-${data.tier}">
+            <div class="mastery-cell-tier">${data.tier}</div>
+            <div class="mastery-cell-runs">${data.runs}r · ${wr}${gap?` · ${gap}`:''}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    `).join('')}
+  `;
+  container.appendChild(block);
+});
+
+// ============================================================
+// GROWTH CHARTS (simple canvas line charts)
+// ============================================================
+function drawLineChart(canvasId, datasets, yMax, yFormatter) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width  = canvas.offsetParent?.offsetWidth || 400;
+  const H = canvas.height = 220;
+  const pad = {top:10, right:20, bottom:30, left:40};
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top  - pad.bottom;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Grid lines
+  for (let i=0;i<=4;i++) {
+    const y = pad.top + ch*(1-i/4);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(pad.left+cw, y);
+    ctx.strokeStyle='rgba(255,255,255,0.05)';
+    ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.fillStyle='rgba(180,170,160,0.4)';
+    ctx.font="9px 'Cinzel', serif";
+    ctx.textAlign='right';
+    ctx.fillText(yFormatter(yMax*i/4), pad.left-4, y+3);
+  }
+
+  // Each dataset
+  datasets.forEach(ds => {
+    const pts = ds.values;
+    if (!pts.length) return;
+    const xStep = cw / Math.max(pts.length-1, 1);
+
+    ctx.beginPath();
+    pts.forEach((v,i) => {
+      const x = pad.left + i*xStep;
+      const y = pad.top + ch*(1 - Math.min(v,yMax)/yMax);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle = ds.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Fill under
+    ctx.beginPath();
+    pts.forEach((v,i) => {
+      const x = pad.left + i*xStep;
+      const y = pad.top + ch*(1 - Math.min(v,yMax)/yMax);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.lineTo(pad.left+cw, pad.top+ch);
+    ctx.lineTo(pad.left, pad.top+ch);
+    ctx.closePath();
+    ctx.fillStyle = ds.color+'18';
+    ctx.fill();
+  });
+
+  // X axis labels
+  const maxPts = Math.max(...datasets.map(d=>d.values.length));
+  const labelStep = Math.ceil(maxPts/6);
+  ctx.fillStyle='rgba(180,170,160,0.4)';
+  ctx.font="8px 'Cinzel', serif";
+  ctx.textAlign='center';
+  for(let i=0;i<maxPts;i+=labelStep){
+    const x = pad.left + (i/(maxPts-1))*cw;
+    ctx.fillText(`${i*10}`, x, H-8);
+  }
+}
+
+setTimeout(() => {
+  const wrDatasets = activePlayers.map(p => ({
+    values: p.rolling_wr,
+    color: PLAYER_COLORS[p.name]
+  }));
+  drawLineChart('wrChart', wrDatasets, 1.0, v => (v*100).toFixed(0)+'%');
+
+  const ascDatasets = activePlayers.map(p => ({
+    values: p.rolling_asc,
+    color: PLAYER_COLORS[p.name]
+  }));
+  drawLineChart('ascChart', ascDatasets, 10, v => v.toFixed(0));
+
+  // Legend
+  ['wrChart','ascChart'].forEach(id => {
+    const c = document.getElementById(id);
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    activePlayers.forEach((p,i) => {
+      const x = 50 + i*80;
+      ctx.fillStyle = PLAYER_COLORS[p.name];
+      ctx.fillRect(x, 8, 16, 2);
+      ctx.font = "9px 'Cinzel', serif";
+      ctx.fillText(p.name, x+20, 11);
+    });
+  });
+}, 200);
+
+// ============================================================
+// DISAGREEMENTS
+// ============================================================
+const disagreeGrid = document.getElementById('disagree-grid');
+const fr = DATA.fun_ratings;
+const ratedPlayers = Object.keys(fr);
+const allArchs = Object.keys(fr[ratedPlayers[0]] || {});
+
+const disagreements = allArchs.map(arch => {
+  const vals = ratedPlayers.map(p => fr[p][arch]).filter(v=>v!=null);
+  const gap = vals.length > 1 ? Math.max(...vals) - Math.min(...vals) : 0;
+  return {arch, gap, vals: Object.fromEntries(ratedPlayers.map(p=>[p, fr[p][arch]]))};
+}).filter(d=>d.gap>=2).sort((a,b)=>b.gap-a.gap);
+
+disagreements.slice(0,12).forEach(d => {
+  const charKey = ARCH_CHARS[d.arch] || '';
+  const charColor = CHAR_COLORS[charKey?.toUpperCase()] || '#888';
+  const card = document.createElement('div');
+  card.className = 'disagree-card';
+  card.innerHTML = `
+    <div class="disagree-arch" style="color:${charColor}">${ARCH_LABELS[d.arch] || d.arch} <span style="color:var(--muted);font-size:10px;font-weight:400">${charKey}</span></div>
+    <div class="disagree-ratings">
+      ${ratedPlayers.map(pn => {
+        const v = d.vals[pn];
+        if (v == null) return '';
+        const stars = '★'.repeat(v) + '☆'.repeat(5-v);
+        return `<div class="disagree-player">
+          <div class="disagree-player-name" style="color:${PLAYER_COLORS[pn]}">${pn}</div>
+          <div class="disagree-stars" style="color:${PLAYER_COLORS[pn]}">${stars}</div>
+          <div style="font-family:'Cinzel',serif;font-size:10px;color:var(--muted)">${v}/5</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+  disagreeGrid.appendChild(card);
+});
+
+</script>
+</body>
+</html>
